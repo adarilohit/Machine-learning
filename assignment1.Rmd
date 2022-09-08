@@ -1,0 +1,5 @@
+input <- height_versus_weight[,c('Female','Male')]
+print(input)
+
+ plot(x=input$`Height (cm)`,y=input$Female, xlab = "Height (cm)",ylab = "Female", xlim = c(140,200), ylim = c(40,100), main = "height of female vs weight of female")
+ 
