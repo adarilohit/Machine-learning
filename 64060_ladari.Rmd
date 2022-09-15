@@ -1,0 +1,20 @@
+#dataset is downloaded from
+https://www.highcharts.com/demo/scatter
+
+#import dataset 
+input <- height_versus_weight[,c('Female','Male')]
+
+#to view dataset
+print(input)
+
+#to plot between height of male and height of female
+#xlab - used to label x axis
+#ylab - used to label y axis
+#xlim,ylim - used to set limits 
+plot(x=input$ Height (cm),y=input$Female,
+xlab = "Height (cm)",
+ylab = "Female", 
+xlim = c(140,200), 
+ylim = c(40,100), 
+main = "height of female vs weight of female"
+)
