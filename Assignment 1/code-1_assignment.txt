@@ -1,0 +1,58 @@
+input <- height_versus_weight[,c('female','male')]
+print(head(input))
+# Get the input values.
+input <- height_versus_weight[,c('female','male')]
+
+# Give the chart file a name.
+png(file = "scatterplot.png")
+
+# Plot the chart for female with 40 to 100 and male with 40 to 100.
+plot(x = input$female,y = input$male,
+   xlab = "female",
+   ylab = "Male",
+   xlim = c(40,100),
+   ylim = c(40,100),		 
+   main = "Female vs Male"
+)
+	 
+# Save the file.
+dev.off()
+
+x is the data set whose values are the horizontal coordinates.
+
+y is the data set whose values are the vertical coordinates.
+
+main is the tile of the graph.
+
+xlab is the label in the horizontal axis.
+
+ylab is the label in the vertical axis.
+
+xlim is the limits of the values of x used for plotting.
+
+ylim is the limits of the values of y used for plotting.
+
+
+
+
+### covid cases
+rm(list=ls())
+library(Hmisc)
+data<-read.csv("D:\\covid_19_data.csv")
+describe(data)
+input<-covid_19_data
+print<-data
+print
+print(head(data))
+input<-data[,c("Confirmed","Deaths")]
+png(file="scatterplot.png")
+#plot the chart for covid cases with confirmed cases between 5 to 10 and and deaths between 1 to 5.
+plot(x=input$Confirmed,y=input$Deaths,
+      xlab="confirmed",
+      ylab="Deaths",
+      xlim=c(5,10),
+      ylim=c(1,5),
+      main="confirmed vs deaths")
+plot(x,y)
+
+
