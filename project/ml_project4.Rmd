@@ -1,0 +1,156 @@
+---
+title: "ml-project "
+author: "lohit adari"
+date: "2022-12-03"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Bike rental prediction
+
+
+```{r}
+rm(list=ls()) ; gc()
+library(car)
+library(explore)
+library(ggplot2)
+library(DataExplorer)
+library(MASS)
+library(xgboost)
+library(caret)
+library(lightgbm)
+library(gbm)
+library(gridExtra)
+
+```
+
+```{r}
+bikes_df<-read.csv("C:/Users/adari/Downloads/train (1).csv",sep=";",header = TRUE,skip = 1)
+bikes_df_test<-read.table("C:/Users/adari/Downloads/test.csv",sep = ";",skip = 1)
+colnames(bikes_df)<-c("id","year","hour","season","holiday","workingday","weather","temp","atemp","humidity", "windspeed","target")
+colnames(bikes_df_test) <-c("id","year","hour","season","holiday","workingday","weather","temp","atemp","humidity","windspeed")
+```
+
+
+```{r}
+head(bikes_df)
+paste("Dimension of dataset: ", dim(bikes_df))
+```
+
+```{r}
+head(bikes_df_test)
+paste("Dimension of dataset: ", dim(bikes_df_test))
+```
+EDA: Exploratory Data Analysis
+```{r}
+summary(bikes_df)
+```
+
+```{r}
+str(bikes_df)
+```
+Target variabale
+explain its poission
+```{r}
+ggplot(bikes_df, aes(x=target)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="white")+
+ geom_density(alpha=.2, fill="#FF6666")
+```
+
+```{r}
+options(repr.plot.width=18, repr.plot.height=10)
+plot_histogram(bikes_df)
+```
+
+```{r}
+plot_density(bikes_df)
+```
+
+```{r}
+plot_boxplot(bikes_df,by="target")
+```
+# Drop Id column
+```{r}
+plot_correlation(bikes_df, type = 'continuous')
+```
+Year Variable
+```{r}
+options(repr.plot.width=8, repr.plot.height=6)
+ggplot(bikes_df, aes(x=year)) +
+  geom_bar()
+```
+
+```{r}
+winter_high_demand_df <- subset(bikes_df, season == 1 & target > 400)
+head(winter_high_demand_df)
+paste("Number of rows: ", dim(winter_high_demand_df))
+```
+
+```{r}
+options(repr.plot.width=14, repr.plot.height=10)
+plot_histogram(winter_high_demand_df)
+```
+
+
+working day
+```{r}
+ggplot(bikes_df, aes(x=workingday)) +
+  geom_bar()
+```
+
+
+
+```{r}
+outiler_rows <- length(boxplot(subset(bikes_df,humidity>=0  & humidity <= 20)$target ,plot=FALSE)$out)+
+length(boxplot(subset(bikes_df,humidity>=20 & humidity <= 40)$target ,plot=FALSE)$out)+
+length(boxplot(subset(bikes_df,humidity>=40 & humidity <= 60)$target ,plot=FALSE)$out)+
+length(boxplot(subset(bikes_df,humidity>=60 & humidity <= 80)$target ,plot=FALSE)$out)+
+length(boxplot(subset(bikes_df,humidity>=80 & humidity <= 100)$target ,plot=FALSE)$out)
+
+paste("We will drop about", outiler_rows, "outliers")
+```
+
+windspeed
+```{r}
+explore(bikes_df,`windspeed`, target = target)
+```
+
+```{r}
+paste("Rows with >85 humdity and weather ==1 ",nrow(subset(bikes_df,humidity>85 & weather==1)))
+paste("Rows atemp >40 atemp and weather ==1 ",nrow(subset(bikes_df,atemp>40 & weather==1)))
+```
+
+```{r}
+paste("# Duplicate ids: ",sum(duplicated(bikes_df$id)))
+paste("# Duplicate rows: ",sum(duplicated(bikes_df)))
+```
+
+```{r}
+
+```
+
+Data analysis
+```{r}
+library(factoextra)
+library(dplyr)
+n<-fviz_nbclust(bikes_df,kmeans,method="wss")+labs(subtitle = "elbow method")
+```
+
+```{r}
+library(NbClust)
+library(factoextra)
+m<-fviz_nbclust(bikes_df[,1:3], kmeans, method = "silhouette")+
+labs(subtitle = "Silhouette method")
+```
+
+```{r}
+pcluster<-prcomp(bikes_df[,4:7],scale. = FALSE)
+summary(pcluster)
+pcluster$rotation[,1:2]
+```
+
+
