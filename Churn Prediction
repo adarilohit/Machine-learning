@@ -1,0 +1,63 @@
+# Install required packages if not already installed
+install.packages("caret")
+install.packages("ggplot2")
+install.packages("dplyr")
+
+# Load necessary libraries
+library(caret)
+library(ggplot2)
+library(dplyr)
+
+# Load dataset (replace 'churn_data.csv' with actual dataset)
+data <- read.csv("churn_data.csv", stringsAsFactors = TRUE)
+
+# View dataset structure
+str(data)
+
+# Handle missing values (if any)
+data <- na.omit(data)  # Removes rows with missing values
+
+# Convert categorical variables to factors (if needed)
+data$Churn <- as.factor(data$Churn)  # Ensure Churn is a factor (1 = Churn, 0 = No Churn)
+
+# Exploratory Data Analysis (EDA)
+summary(data)
+ggplot(data, aes(x = Churn, fill = Churn)) + geom_bar() + ggtitle("Churn Distribution")
+
+# Split data into training (80%) and testing (20%) sets
+set.seed(123)
+trainIndex <- createDataPartition(data$Churn, p = 0.8, list = FALSE)
+trainData <- data[trainIndex, ]
+testData <- data[-trainIndex, ]
+
+# Train a Logistic Regression Model
+logit_model <- glm(Churn ~ ., data = trainData, family = binomial)
+
+# Model Summary
+summary(logit_model)  # Displays coefficients and statistical significance
+
+# Predict on test data
+pred_prob <- predict(logit_model, testData, type = "response")
+pred_class <- ifelse(pred_prob > 0.5, 1, 0)  # Convert probabilities to binary output
+
+# Evaluate Model Performance
+conf_matrix <- confusionMatrix(as.factor(pred_class), testData$Churn)
+print(conf_matrix)
+
+# Calculate Accuracy, Precision, Recall
+accuracy <- conf_matrix$overall["Accuracy"]
+precision <- conf_matrix$byClass["Pos Pred Value"]
+recall <- conf_matrix$byClass["Sensitivity"]
+
+print(paste("Accuracy:", round(accuracy, 4)))
+print(paste("Precision:", round(precision, 4)))
+print(paste("Recall:", round(recall, 4)))
+
+# Feature Importance (Impact of Variables)
+exp(coef(logit_model))  # Exponentiate coefficients for odds ratio interpretation
+
+# Visualizing predicted probabilities
+testData$Predicted_Prob <- pred_prob
+ggplot(testData, aes(x = Predicted_Prob, fill = Churn)) +
+  geom_density(alpha = 0.5) +
+  ggtitle("Density Plot of Predicted Churn Probabilities")
